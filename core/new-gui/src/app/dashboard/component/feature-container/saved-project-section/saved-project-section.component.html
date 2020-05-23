@@ -1,5 +1,4 @@
 <div class="saved-project-container subsection-grid-container">
-
       <mat-card class="project-section-title subsection-grid-container">
         <div ngbDropdown class="d-inline-block">
           <button class="btn btn-outline-primary" id="sortDropdown" ngbDropdownToggle>Sort</button>
@@ -34,7 +33,7 @@
                 <span class="time-space"></span>
                 Created: {{project.creationTime | date:'yyyy-MM-dd HH:mm'}}
               </p>
-              <button mat-button class="delete-project-btn" placement="bottom" ngbTooltip="Delete the {{project.name}}" (click)="openNgbdModalDeleteProjectComponent(project)" ><i class="fa fa-trash"></i></button>
+              <button mat-button class="delete-project-btn" placement="bottom" nz-popover nzPopoverContent="Delete the {{project.name}}" (click)="openNgbdModalDeleteProjectComponent(project)" ><i class="fa fa-trash"></i></button>
             </mat-list-item>
 
             </div>

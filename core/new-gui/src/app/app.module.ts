@@ -6,9 +6,7 @@ import { environment } from './../environments/environment';
 
 import { CustomNgMaterialModule } from './common/custom-ng-material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgbModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
-import { TourNgBootstrapModule } from 'ngx-tour-ng-bootstrap';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 
 import { MaterialDesignFrameworkModule } from 'angular6-json-schema-form';
@@ -65,6 +63,13 @@ import { ResourceSectionComponent } from './dashboard/component/feature-containe
 
 import { FileUploadModule } from 'ng2-file-upload';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
+import { registerLocaleData } from '@angular/common';
+import en from '@angular/common/locales/en';
+
+import { ComponentInserterService } from './service/component-inserter.service';
+
+registerLocaleData(en);
 
 @NgModule({
   declarations: [
@@ -110,16 +115,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgxJsonViewerModule,
     CustomNgMaterialModule,
     BrowserAnimationsModule,
-    NgbModule,
-    NgbPopoverModule,
     RouterModule.forRoot([]),
-    TourNgBootstrapModule.forRoot(),
 
     MaterialDesignFrameworkModule,
     FileUploadModule,
     FormsModule,
     ReactiveFormsModule,
     LoggerModule.forRoot({level: environment.production ? NgxLoggerLevel.ERROR : NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.OFF}),
+    NgZorroAntdModule,
 
   ],
   entryComponents: [
@@ -130,7 +133,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgbdModalResourceDeleteComponent,
     NgbModalComponent
   ],
-  providers: [HttpClientModule],
+  providers: [
+    HttpClientModule,
+    { provide: NZ_I18N, useValue: en_US },
+    ComponentInserterService
+  ],
   bootstrap: [AppComponent],
   // dynamically created component must be placed in the entryComponents attribute
 })

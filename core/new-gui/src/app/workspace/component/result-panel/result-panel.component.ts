@@ -1,10 +1,12 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, ComponentRef, ViewChild, Input, ViewContainerRef, Optional, Inject } from '@angular/core';
 import { MatPaginator, MatTableDataSource, PageEvent } from '@angular/material';
 
 import { ExecuteWorkflowService } from './../../service/execute-workflow/execute-workflow.service';
 import { Observable } from 'rxjs/Observable';
 
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ZorroModalDialogueComponent } from '../../../abstract-component/zorro-modal.component';
+import { ComponentInserterService } from '../../../service/component-inserter.service';
+
 import { ExecutionResult, SuccessExecutionResult } from './../../types/execute-workflow.interface';
 import { TableColumn, IndexableObject } from './../../types/result-table.interface';
 import { ResultPanelToggleService } from './../../service/result-panel-toggle/result-panel-toggle.service';
@@ -49,9 +51,10 @@ export class ResultPanelComponent {
   private currentPageSize: number = 0;
   private currentPageIndex: number = 0;
 
-  constructor(private executeWorkflowService: ExecuteWorkflowService, private modalService: NgbModal,
-    private resultPanelToggleService: ResultPanelToggleService) {
-
+  constructor(private executeWorkflowService: ExecuteWorkflowService,
+    private resultPanelToggleService: ResultPanelToggleService,
+    private componentInserter: ComponentInserterService,
+    private viewContainerRef: ViewContainerRef) {
 
     // once an execution has ended, update the result panel to dispaly
     //  execution result or error
@@ -62,6 +65,8 @@ export class ResultPanelComponent {
     this.resultPanelToggleService.getToggleChangeStream().subscribe(
       value => this.showResultPanel = value,
     );
+
+
   }
 
   /**
@@ -72,7 +77,6 @@ export class ResultPanelComponent {
    * @param rowData the object containing the data of the current row in columnDef and cellData pairs
    */
   public open(rowData: object): void {
-
     // the row index will include the previous pages, therefore we need to minus the current page index
     //  multiply by the page size previously.
     const selectedRowIndex = this.currentResult.findIndex(eachRow => isEqual(eachRow, rowData));
@@ -83,10 +87,12 @@ export class ResultPanelComponent {
     const rowDataCopy = ResultPanelComponent.trimDisplayJsonData(rowData as IndexableObject);
 
     // open the modal component
-    const modalRef = this.modalService.open(NgbModalComponent, {size: 'lg'});
+    const modalRef = this.componentInserter.injectComponent<NgbModalComponent>(
+      NgbModalComponent,
+      this.viewContainerRef);
 
     // subscribe the modal close event for modal navigations (go to previous or next row detail)
-    Observable.from(modalRef.result)
+    Observable.from(modalRef.instance.result)
       .subscribe((modalResult: number) => {
         if (modalResult === 1) {
           // navigate to previous detail modal
@@ -98,7 +104,7 @@ export class ResultPanelComponent {
       });
 
     // cast the instance type from `any` to NgbModalComponent
-    const modalComponentInstance = modalRef.componentInstance as NgbModalComponent;
+    const modalComponentInstance = modalRef.instance as NgbModalComponent;
 
     // set the currentDisplayRowData of the modal to be the data of clicked row
     modalComponentInstance.currentDisplayRowData = rowDataCopy;
@@ -289,7 +295,7 @@ export class ResultPanelComponent {
   templateUrl: './result-panel-modal.component.html',
   styleUrls: ['./result-panel.component.scss']
 })
-export class NgbModalComponent {
+export class NgbModalComponent extends ZorroModalDialogueComponent<number>  {
   // when modal is opened, currentDisplayRow will be passed as
   //  componentInstance to this NgbModalComponent to display
   //  as data table.
@@ -309,7 +315,9 @@ export class NgbModalComponent {
   //  the pop-up modal.
   // it is used in the HTML template
 
-  constructor(public activeModal: NgbActiveModal) { }
+  constructor(
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbModalComponent>>
+  ) { super(ref); }
 
 }
 

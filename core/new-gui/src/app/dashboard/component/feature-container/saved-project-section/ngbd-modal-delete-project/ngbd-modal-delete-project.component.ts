@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input, ComponentRef, Optional, Inject } from '@angular/core';
 import { SavedProject } from '../../../../type/saved-project';
+import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
 
 /**
  * NgbdModalDeleteProjectComponent is the pop-up component
@@ -13,7 +13,7 @@ import { SavedProject } from '../../../../type/saved-project';
   templateUrl: './ngbd-modal-delete-project.component.html',
   styleUrls: ['./ngbd-modal-delete-project.component.scss', '../../../dashboard.component.scss']
 })
-export class NgbdModalDeleteProjectComponent {
+export class NgbdModalDeleteProjectComponent extends ZorroModalDialogueComponent<boolean> {
   defaultSavedProject: SavedProject = {
     name: '',
     id: '',
@@ -21,8 +21,8 @@ export class NgbdModalDeleteProjectComponent {
     lastModifiedTime: ''
   };
   @Input() project: SavedProject = this.defaultSavedProject;
-
-  constructor(public activeModal: NgbActiveModal) {
+  constructor(@Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalDeleteProjectComponent>>) {
+    super(ref);
   }
 
   /**
@@ -32,7 +32,6 @@ export class NgbdModalDeleteProjectComponent {
   * @param
   */
   public deleteSavedProject(): void {
-    this.activeModal.close(true);
+    this.closeModal(true);
   }
-
 }

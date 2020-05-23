@@ -1,6 +1,5 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Component, ComponentRef, Optional, Inject } from '@angular/core';
+import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
 /**
  * NgbdModalAddProjectComponent is the pop-up component
  * to let user create new project. User needs to specify
@@ -13,11 +12,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: 'ngbd-modal-add-project.component.html',
   styleUrls: ['../../../dashboard.component.scss', 'ngbd-modal-add-project.component.scss']
 })
-export class NgbdModalAddProjectComponent {
-
+export class NgbdModalAddProjectComponent extends ZorroModalDialogueComponent<string> {
   public name: string = '';
 
-  constructor(public activeModal: NgbActiveModal) { }
+  constructor(@Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalAddProjectComponent>>) {
+    super(ref);
+  }
 
   /**
   * addProject records the project information and return
@@ -27,7 +27,7 @@ export class NgbdModalAddProjectComponent {
   */
   public addProject(): void {
     if (this.name !== '') {
-      this.activeModal.close(this.name);
+      this.closeModal(this.name);
     } else {
       $('#warning').text('Please input the project name!');
     }

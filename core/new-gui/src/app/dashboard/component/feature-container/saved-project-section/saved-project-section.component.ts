@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, ViewChild, Directive, ViewContainerRef} from '@angular/core';
 
 import { SavedProject } from '../../../type/saved-project';
 import { SavedProjectService } from '../../../service/saved-project/saved-project.service';
@@ -9,6 +8,15 @@ import { NgbdModalDeleteProjectComponent } from './ngbd-modal-delete-project/ngb
 
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
+
+import { ComponentInserterService } from '../../../../service/component-inserter.service';
+
+@Directive({
+  selector: '[texeraSaveProjectSectionModalRoot]',
+})
+export class ModalRootDirective {
+  constructor(public viewContainerRef: ViewContainerRef) { }
+}
 
 /**
  * SavedProjectSectionComponent is the main interface for
@@ -28,10 +36,12 @@ export class SavedProjectSectionComponent implements OnInit {
   public projects: SavedProject[] = [];
 
   public defaultWeb: String = 'http://localhost:4200/';
+  @ViewChild(ModalRootDirective, {static: true}) modalRoot!: ModalRootDirective;
 
   constructor(
     private savedProjectService: SavedProjectService,
-    private modalService: NgbModal
+    private componentInserter: ComponentInserterService,
+    private viewContainerRef: ViewContainerRef
   ) { }
 
   ngOnInit() {
@@ -101,9 +111,12 @@ export class SavedProjectSectionComponent implements OnInit {
   * @param
   */
   public openNgbdModalAddProjectComponent(): void {
-    const modalRef = this.modalService.open(NgbdModalAddProjectComponent);
-
-    Observable.from(modalRef.result)
+    const modalRef = this.componentInserter.injectComponent<NgbdModalAddProjectComponent>(
+      NgbdModalAddProjectComponent,
+      this.viewContainerRef
+    );
+    modalRef.instance.showModal();
+    Observable.from(modalRef.instance.result)
       .subscribe((value: string) => {
         if (value) {
           const newProject: SavedProject = {
@@ -126,10 +139,14 @@ export class SavedProjectSectionComponent implements OnInit {
   * @param
   */
   public openNgbdModalDeleteProjectComponent(project: SavedProject): void {
-    const modalRef = this.modalService.open(NgbdModalDeleteProjectComponent);
-    modalRef.componentInstance.project = cloneDeep(project);
 
-    Observable.from(modalRef.result).subscribe(
+    const modalRef = this.componentInserter.injectComponent<NgbdModalDeleteProjectComponent>(
+      NgbdModalDeleteProjectComponent,
+      this.viewContainerRef
+    );
+    modalRef.instance.showModal();
+
+    Observable.from(modalRef.instance.result).subscribe(
       (value: boolean) => {
         if (value) {
           this.projects = this.projects.filter(obj => obj.id !== project.id);

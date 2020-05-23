@@ -1,6 +1,7 @@
+<nz-modal [nzVisible]="isModalVisible">
 <div class="modal-header">
   <h4 class="modal-title">Row Details</h4>
-  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+  <button type="button" class="close" aria-label="Close" (click)="this.dismissModal('Cross click')">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -9,10 +10,10 @@
 </div>
 <div class="modal-footer">
     <button class="btn btn-outline-dark" [disabled]="currentDisplayRowIndex === 0"
-      (click)="activeModal.close(1)">Previous</button>
+      (click)="this.closeModal(1)">Previous</button>
     <button class="btn btn-outline-dark" [disabled]="currentDisplayRowIndex === (currentPageSize - 1)"
-      (click)="activeModal.close(2)">Next</button>
-    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close(0)">Close</button>
+      (click)="this.closeModal(2)">Next</button>
+    <button type="button" class="btn btn-outline-dark" (click)="this.closeModal(0)">Close</button>
 </div>
 
 

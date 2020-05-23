@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { TourService, IStepOption } from 'ngx-tour-ng-bootstrap';
 
 /**
  * ProductTourComponent is the product tour that shows basic product tutorial.
@@ -29,7 +28,7 @@ import { TourService, IStepOption } from 'ngx-tour-ng-bootstrap';
 })
 export class ProductTourComponent implements OnInit {
 
-  private steps: IStepOption[] = [{
+  private steps: object[] = [{
     anchorId: 'texera-navigation-grid-container',
     content: `
     <div class="intro">
@@ -155,9 +154,7 @@ export class ProductTourComponent implements OnInit {
   }];
 
 
-  constructor(public tourService: TourService) {
-
-    this.tourService.initialize(this.steps);
+  constructor() {
 
   }
 

@@ -4,9 +4,9 @@ import { v4 as uuid } from 'uuid';
 import { Observable, of, Subject} from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { ZorroTooltipComponent } from './../../../../abstract-component/zorro-tooltip.component';
 
 import { OperatorSchema } from '../../../types/operator-schema.interface';
-import { NgbTooltip } from '../../../../../../node_modules/@ng-bootstrap/ng-bootstrap/tooltip/tooltip';
 
 /**
  * OperatorLabelComponent is one operator box in the operator panel.
@@ -18,13 +18,12 @@ import { NgbTooltip } from '../../../../../../node_modules/@ng-bootstrap/ng-boot
   templateUrl: './operator-label.component.html',
   styleUrls: ['./operator-label.component.scss']
 })
-export class OperatorLabelComponent implements OnInit, AfterViewInit {
+export class OperatorLabelComponent  extends ZorroTooltipComponent implements OnInit, AfterViewInit{
 
   public static operatorLabelPrefix = 'texera-operator-label-';
   public static operatorLabelSearchBoxPrefix = 'texera-operator-label-search-result-';
 
   // tooltipWindow is an instance of ngbTooltip (popup box)
-  @ViewChild('ngbTooltip', { static : false }) tooltipWindow: NgbTooltip | undefined;
   @Input() operator?: OperatorSchema;
   // whether the operator label is from the operator panel or the search box
   @Input() fromSearchBox?: boolean;
@@ -40,6 +39,7 @@ export class OperatorLabelComponent implements OnInit, AfterViewInit {
   constructor(
     private dragDropService: DragDropService
   ) {
+    super();
   }
 
   ngOnInit() {
@@ -68,16 +68,12 @@ export class OperatorLabelComponent implements OnInit, AfterViewInit {
 
     // whenever an value from openCommandsStream is observed, open tooltipWindow
     this.openCommandsStream.subscribe(v => {
-      if (this.tooltipWindow) {
-        this.tooltipWindow.open();
-      }
+        this.showTooltip();
     });
 
     // whenever an value from mouseLeaveEventStream is observed, close tooltipWindow
     this.mouseLeaveEventStream.subscribe(v => {
-      if (this.tooltipWindow) {
-        this.tooltipWindow.close();
-      }
+        this.hideTooltip();
     });
   }
 

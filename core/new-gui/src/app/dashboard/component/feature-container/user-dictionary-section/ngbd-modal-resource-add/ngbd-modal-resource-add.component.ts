@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ComponentRef, Optional, Inject } from '@angular/core';
 
 import { UserDictionaryService } from '../../../../service/user-dictionary/user-dictionary.service';
 import { UserDictionary } from '../../../../service/user-dictionary/user-dictionary.interface';
@@ -11,6 +10,8 @@ import { MatTabChangeEvent } from '@angular/material';
 
 import { ErrorStateMatcher } from '@angular/material';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+
+import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
 
 class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -37,7 +38,7 @@ class MyErrorStateMatcher implements ErrorStateMatcher {
     UserDictionaryService,
   ]
 })
-export class NgbdModalResourceAddComponent {
+export class NgbdModalResourceAddComponent extends ZorroModalDialogueComponent<string> {
 
   // These are the form data that will be saved in cache if the user close the modal accidently
   public dictName: string = '';
@@ -68,9 +69,11 @@ export class NgbdModalResourceAddComponent {
   public descriptionValidator: FormControl =  new FormControl('', [Validators.required]);
 
   constructor(
-    public activeModal: NgbActiveModal,
-    public userDictionaryService: UserDictionaryService
-  ) { }
+    public userDictionaryService: UserDictionaryService,
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalResourceAddComponent>>
+  ) {
+    super(ref);
+  }
 
   /**
    * Handles the tab change event in the modal popup
@@ -129,7 +132,7 @@ export class NgbdModalResourceAddComponent {
       .subscribe(() => {
         this.isUploading = false;
         this.resetDictionary();
-        this.activeModal.dismiss('close');
+        this.dismissModal('close');
       }, error => {
         this.isUploading = false;
         console.log(error);
@@ -162,7 +165,7 @@ export class NgbdModalResourceAddComponent {
       .subscribe(() => {
         this.isUploading = false;
         this.resetDictionary();
-        this.activeModal.dismiss('close');
+        this.dismissModal('close');
       }, error => {
         this.isUploading = false;
         console.log(error);
@@ -311,7 +314,6 @@ export class NgbdModalResourceAddComponent {
       .filter(file => !file.type.includes('text/plain')).length;
     this.checkDuplicateFiles();
   }
-
 
   /**
    * Generates a random dictionary UUID for the new dictionary generated.

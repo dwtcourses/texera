@@ -1,7 +1,6 @@
 import { Component, OnInit, NgModule } from '@angular/core';
 import { ExecuteWorkflowService } from './../../service/execute-workflow/execute-workflow.service';
 import { UndoRedoService } from './../../service/undo-redo/undo-redo.service';
-import { TourService } from 'ngx-tour-ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { WorkflowActionService } from '../../service/workflow-graph/model/workflow-action.service';
 import { JointGraphWrapper } from '../../service/workflow-graph/model/joint-graph-wrapper';
@@ -40,7 +39,6 @@ export class NavigationComponent implements OnInit {
 
   constructor(
     private executeWorkflowService: ExecuteWorkflowService,
-    public tourService: TourService,
     private workflowActionService: WorkflowActionService,
     private workflowStatusService: WorkflowStatusService,
     public undoRedo: UndoRedoService

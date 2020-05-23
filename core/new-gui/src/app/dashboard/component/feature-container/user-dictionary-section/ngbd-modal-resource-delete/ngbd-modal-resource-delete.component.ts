@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ComponentRef, Optional, Inject } from '@angular/core';
 import { UserDictionary } from '../../../../service/user-dictionary/user-dictionary.interface';
+
+import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
 
 /**
  * NgbdModalResourceDeleteComponent is the pop-up
@@ -15,7 +16,7 @@ import { UserDictionary } from '../../../../service/user-dictionary/user-diction
   styleUrls: ['./ngbd-modal-resource-delete.component.scss', '../../../dashboard.component.scss']
 
 })
-export class NgbdModalResourceDeleteComponent {
+export class NgbdModalResourceDeleteComponent extends ZorroModalDialogueComponent<boolean> {
 
   public dictionary: UserDictionary = {
     name: '',
@@ -23,7 +24,10 @@ export class NgbdModalResourceDeleteComponent {
     items: []
   };
 
-  constructor(public activeModal: NgbActiveModal) {
+  constructor(
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalResourceDeleteComponent>>
+  ) {
+    super(ref);
   }
 
   /**
@@ -33,7 +37,15 @@ export class NgbdModalResourceDeleteComponent {
   * @param
   */
   public deleteDictionary(): void {
-    this.activeModal.close(true);
+    this.closeModal(true);
+  }
+
+  public toggleModal(): void {
+    if (this.isModalVisible) {
+      this.isModalVisible = false;
+    } else {
+      this.isModalVisible = true;
+    }
   }
 
 }

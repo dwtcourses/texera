@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ComponentRef, Optional, Inject } from '@angular/core';
 import { UserDictionary } from '../../../../service/user-dictionary/user-dictionary.interface';
 import { UserDictionaryService } from '../../../../service/user-dictionary/user-dictionary.service';
+
+import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
 
 /**
  * NgbdModalResourceViewComponent is the pop-up component to
@@ -18,7 +19,7 @@ import { UserDictionaryService } from '../../../../service/user-dictionary/user-
     UserDictionaryService,
   ]
 })
-export class NgbdModalResourceViewComponent {
+export class NgbdModalResourceViewComponent extends ZorroModalDialogueComponent<boolean> {
 
   public dictionary: UserDictionary = {
     name: '',
@@ -32,7 +33,12 @@ export class NgbdModalResourceViewComponent {
   public visible = true;
   public selectable = true;
 
-  constructor(public activeModal: NgbActiveModal, private userDictionaryService: UserDictionaryService) {}
+  constructor(
+    private userDictionaryService: UserDictionaryService,
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalResourceViewComponent>>
+    ) {
+    super(ref);
+  }
 
   /**
   * addDictionaryItem gets the item added by user and sends it back to the main component.
@@ -61,6 +67,7 @@ export class NgbdModalResourceViewComponent {
     this.dictionary.items = this.dictionary.items.filter(dictItems => dictItems !== item);
     this.userDictionaryService.putUserDictionaryData(this.dictionary).subscribe();
   }
+
 }
 
 

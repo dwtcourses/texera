@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ViewChild, Directive, ViewContainerRef} from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { UserDictionary } from '../../../service/user-dictionary/user-dictionary.interface';
@@ -10,8 +9,17 @@ import { NgbdModalResourceAddComponent } from './ngbd-modal-resource-add/ngbd-mo
 import { NgbdModalResourceDeleteComponent } from './ngbd-modal-resource-delete/ngbd-modal-resource-delete.component';
 import { NgbdModalResourceViewComponent } from './ngbd-modal-resource-view/ngbd-modal-resource-view.component';
 
+import { ComponentInserterService } from '../../../../service/component-inserter.service';
+
 import { cloneDeep } from 'lodash';
 import { FileItem } from 'ng2-file-upload';
+
+@Directive({
+  selector: '[texeraSaveProjectSectionModalRoot]',
+})
+export class ModalRootDirective {
+  constructor(public viewContainerRef: ViewContainerRef) { }
+}
 
 export interface SavedAddDictionaryState extends Readonly<{
   name: string;
@@ -46,9 +54,12 @@ export class UserDictionarySectionComponent {
     savedQueue: [],
   };
 
+  @ViewChild(ModalRootDirective, {static: true}) modalRoot!: ModalRootDirective;
+
   constructor(
     private userDictionaryService: UserDictionaryService,
-    private modalService: NgbModal
+    private componentInserter: ComponentInserterService,
+    private viewContainerRef: ViewContainerRef
   ) {
     this.refreshUserDictionary();
   }
@@ -71,13 +82,13 @@ export class UserDictionarySectionComponent {
   * @param dictionary: the dictionary that user wants to view
   */
   public openNgbdModalResourceViewComponent(dictionary: UserDictionary): void {
-    const modalRef = this.modalService.open(NgbdModalResourceViewComponent, {
-      beforeDismiss: () => {
-        this.refreshUserDictionary();
-        return true;
-      }
+    const modalRef = this.componentInserter.injectComponent<NgbdModalResourceViewComponent>(
+      NgbdModalResourceViewComponent,
+      this.viewContainerRef);
+    modalRef.instance.result.catch(() => {
+      this.refreshUserDictionary();
     });
-    modalRef.componentInstance.dictionary = cloneDeep(dictionary);
+    modalRef.instance.dictionary = cloneDeep(dictionary);
   }
 
   /**
@@ -91,32 +102,31 @@ export class UserDictionarySectionComponent {
   * @param
   */
   public openNgbdModalResourceAddComponent(): void {
-    const modalRef = this.modalService.open(NgbdModalResourceAddComponent, {
-      // before the modal closes, save the state and refresh the dictionaries on the feature container
-      beforeDismiss: (): boolean => {
-        this.savedState = {
-          name: modalRef.componentInstance.dictName,
-          content: modalRef.componentInstance.dictContent,
-          separator: modalRef.componentInstance.dictSeparator,
-          description: modalRef.componentInstance.dictionaryDescription,
-          savedQueue: modalRef.componentInstance.uploader.queue
-        };
+    const modalRef = this.componentInserter.injectComponent<NgbdModalResourceAddComponent>(
+      NgbdModalResourceAddComponent,
+      this.viewContainerRef);
+    modalRef.instance.result.catch(() => {
+      this.savedState = {
+      name: modalRef.instance.dictName,
+      content: modalRef.instance.dictContent,
+      separator: modalRef.instance.dictSeparator,
+      description: modalRef.instance.dictionaryDescription,
+      savedQueue: modalRef.instance.uploader.queue
+      };
 
-        // refresh the dictionaries in the panel to show the new updates done by users
-        this.refreshUserDictionary();
-        return true;
-      }
+      // refresh the dictionaries in the panel to show the new updates done by users
+      this.refreshUserDictionary();
     });
 
     // initialize the value from saving, used when user close the popup and then temporarily save dictionary.
-    modalRef.componentInstance.uploader.queue = this.savedState.savedQueue;
-    modalRef.componentInstance.dictName = this.savedState.name;
-    modalRef.componentInstance.dictContent = this.savedState.content;
-    modalRef.componentInstance.dictSeparator = this.savedState.separator;
-    modalRef.componentInstance.dictionaryDescription = this.savedState.description;
+    modalRef.instance.uploader.queue = this.savedState.savedQueue;
+    modalRef.instance.dictName = this.savedState.name;
+    modalRef.instance.dictContent = this.savedState.content;
+    modalRef.instance.dictSeparator = this.savedState.separator;
+    modalRef.instance.dictionaryDescription = this.savedState.description;
 
     // checks if the files saved in the state are valid.
-    modalRef.componentInstance.checkCurrentFilesValid();
+    modalRef.instance.checkCurrentFilesValid();
   }
 
   /**
@@ -129,10 +139,12 @@ export class UserDictionarySectionComponent {
   * @param dictionary: the dictionary that user wants to remove
   */
   public openNgbdModalResourceDeleteComponent(dictionary: UserDictionary): void {
-    const modalRef = this.modalService.open(NgbdModalResourceDeleteComponent);
-    modalRef.componentInstance.dictionary = cloneDeep(dictionary);
+    const modalRef = this.componentInserter.injectComponent<NgbdModalResourceDeleteComponent>(
+      NgbdModalResourceDeleteComponent,
+      this.viewContainerRef);
+    modalRef.instance.dictionary = cloneDeep(dictionary);
 
-    Observable.from(modalRef.result).subscribe(
+    Observable.from(modalRef.instance.result).subscribe(
       (confirmDelete: boolean) => {
         if (confirmDelete) {
           this.userDictionaryService.deleteUserDictionaryData(dictionary.id).subscribe(res => {
