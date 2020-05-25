@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, ComponentRef, Injectable, Inject, ViewContainerRef, ViewRef, Injector, Component, ComponentFactory } from '@angular/core';
+import { ComponentFactoryResolver, ComponentRef, Injectable, Inject, ViewContainerRef, ViewRef, Injector, StaticProvider } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 
 interface ComponentType {
@@ -23,14 +23,15 @@ export class ComponentInserterService {
   constructor( @Inject(ComponentFactoryResolver) private cFR: ComponentFactoryResolver) {
   }
 
-  public injectComponent<T>(component: ComponentType, vCR: ViewContainerRef): ComponentRef<T> {
+  public injectComponent<T>(component: ComponentType, vCR: ViewContainerRef, providers: StaticProvider[] = []): ComponentRef<T> {
     let resolvePromise: (value: ComponentRef<T>) => void;
 
     const componentRefPromise = new Promise<ComponentRef<T>>(( resolve, reject ) => {
       resolvePromise = resolve;
     }); // componentRef of new component
 
-    const injector = Injector.create({providers: [{provide: 'ComponentRefPromise', useValue: componentRefPromise}], parent: vCR.injector});
+    providers.push({provide: 'ComponentRefPromise', useValue: componentRefPromise});
+    const injector = Injector.create({providers: providers, parent: vCR.injector});
     const factory = this.cFR.resolveComponentFactory(component);
     const componentRef = <ComponentRef<T>> vCR.createComponent(factory, undefined, injector);
 

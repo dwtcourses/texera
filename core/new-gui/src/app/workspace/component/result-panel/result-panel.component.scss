@@ -45,8 +45,8 @@
 
 // make modal body scrollable and modal size fixed
 .modal-body{
-  min-height: calc(100vh - 200px);
-  max-height: calc(100vh - 200px);
+  min-height: calc(100vh - 300px);
+  max-height: calc(100vh - 300px);
   overflow-y: auto !important;
 }
 

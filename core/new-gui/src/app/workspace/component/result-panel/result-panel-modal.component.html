@@ -1,19 +1,10 @@
-<nz-modal [nzVisible]="isModalVisible">
-<div class="modal-header">
-  <h4 class="modal-title">Row Details</h4>
-  <button type="button" class="close" aria-label="Close" (click)="this.dismissModal('Cross click')">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-<div class="modal-body content-body">
-  <ngx-json-viewer [json]="currentDisplayRowData" [expanded]="false"></ngx-json-viewer>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-outline-dark" [disabled]="currentDisplayRowIndex === 0"
-      (click)="this.closeModal(1)">Previous</button>
-    <button class="btn btn-outline-dark" [disabled]="currentDisplayRowIndex === (currentPageSize - 1)"
-      (click)="this.closeModal(2)">Next</button>
-    <button type="button" class="btn btn-outline-dark" (click)="this.closeModal(0)">Close</button>
-</div>
-
-
+<nz-modal [nzVisible]="isModalVisible" nzTitle='Row Details' nzCancelText='Close' (nzOnCancel)='this.dismissModal()'>
+  <div class="modal-body content-body">
+    <ngx-json-viewer [json]="currentDisplayRowData" [expanded]="false"></ngx-json-viewer>
+  </div>
+  <ng-template #modalFooter>
+    <button nz-button [disabled]="currentDisplayRowIndex === 0" (click)="this.prev()">Previous</button>
+    <button nz-button [disabled]="currentDisplayRowIndex === (currentPageSize - 1)" (click)="this.next()">Next</button>
+    <button nz-button (click)="this.closeModal()">Close</button>
+  </ng-template>
+</nz-modal>

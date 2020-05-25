@@ -3,6 +3,7 @@ import { UserDictionary } from '../../../../service/user-dictionary/user-diction
 import { UserDictionaryService } from '../../../../service/user-dictionary/user-dictionary.service';
 
 import { ZorroModalDialogueComponent } from '../../../../../abstract-component/zorro-modal.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 /**
  * NgbdModalResourceViewComponent is the pop-up component to
@@ -35,7 +36,8 @@ export class NgbdModalResourceViewComponent extends ZorroModalDialogueComponent<
 
   constructor(
     private userDictionaryService: UserDictionaryService,
-    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalResourceViewComponent>>
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbdModalResourceViewComponent>>,
+    modal: NzModalService
     ) {
     super(ref);
   }

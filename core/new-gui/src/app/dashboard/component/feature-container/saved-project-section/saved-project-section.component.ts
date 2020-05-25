@@ -115,7 +115,6 @@ export class SavedProjectSectionComponent implements OnInit {
       NgbdModalAddProjectComponent,
       this.viewContainerRef
     );
-    modalRef.instance.showModal();
     Observable.from(modalRef.instance.result)
       .subscribe((value: string) => {
         if (value) {
@@ -144,8 +143,6 @@ export class SavedProjectSectionComponent implements OnInit {
       NgbdModalDeleteProjectComponent,
       this.viewContainerRef
     );
-    modalRef.instance.showModal();
-
     Observable.from(modalRef.instance.result).subscribe(
       (value: boolean) => {
         if (value) {

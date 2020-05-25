@@ -1,21 +1,8 @@
-<nz-modal [nzVisible]="isModalVisible">
-  <div class="modal-header">
-    <h4 class="modal-title">Add New Project</h4>
-    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+<nz-modal [nzVisible]="isModalVisible" nzTitle = 'Add New Project' nzCancelText = 'Close' (nzOnCancel) = 'closeModal()' nzOkText = 'Add' (nzOnOk) = 'addProject()'  >
   <div class="modal-body">
-
     <mat-dialog-content>
       <input matInput [(ngModel)]="this.name" placeholder="Name of New Project">
     </mat-dialog-content>
     <div id="warning" class="warning-note"></div>
-
-
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark add-button" (click)="addProject()">Add</button>
-    <button type="button" class="btn btn-outline-dark" (click)="closeModal()">Close</button>
   </div>
 </nz-modal>

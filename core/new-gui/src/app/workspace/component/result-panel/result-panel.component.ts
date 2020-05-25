@@ -4,7 +4,7 @@ import { MatPaginator, MatTableDataSource, PageEvent } from '@angular/material';
 import { ExecuteWorkflowService } from './../../service/execute-workflow/execute-workflow.service';
 import { Observable } from 'rxjs/Observable';
 
-import { ZorroModalDialogueComponent } from '../../../abstract-component/zorro-modal.component';
+import { ZorroModalComponent } from '../../../abstract-component/zorro-modal.component';
 import { ComponentInserterService } from '../../../service/component-inserter.service';
 
 import { ExecutionResult, SuccessExecutionResult } from './../../types/execute-workflow.interface';
@@ -42,6 +42,7 @@ export class ResultPanelComponent {
   public currentColumns: TableColumn[] | undefined;
   public currentDisplayColumns: string[] | undefined;
   public currentDataSource: MatTableDataSource<object> | undefined;
+  public currentModalRef: ComponentRef<NgbModalComponent>|undefined = undefined;
   public showResultPanel: boolean | undefined;
 
   @ViewChild(MatPaginator, { static : false }) paginator: MatPaginator | null = null;
@@ -79,29 +80,44 @@ export class ResultPanelComponent {
   public open(rowData: object): void {
     // the row index will include the previous pages, therefore we need to minus the current page index
     //  multiply by the page size previously.
-    const selectedRowIndex = this.currentResult.findIndex(eachRow => isEqual(eachRow, rowData));
+    let selectedRowIndex = this.currentResult.findIndex(eachRow => isEqual(eachRow, rowData));
 
     const rowPageIndex = selectedRowIndex - this.currentPageIndex * this.currentMaxPageSize;
 
     // generate a new row data that shortens the column text to limit rendering time for pretty json
     const rowDataCopy = ResultPanelComponent.trimDisplayJsonData(rowData as IndexableObject);
 
+    const prev = () => {
+      if (this.currentModalRef) {
+        selectedRowIndex += -1;
+        const newRowData = this.currentResult[selectedRowIndex];
+        this.currentModalRef.instance.currentDisplayRowData = ResultPanelComponent.trimDisplayJsonData(newRowData as IndexableObject);
+        this.currentModalRef.instance.currentDisplayRowIndex = selectedRowIndex - this.currentPageIndex * this.currentMaxPageSize;
+      }
+    };
+    prev.bind(this);
+
+    const next = () => {
+      if (this.currentModalRef) {
+        selectedRowIndex += 1;
+        const newRowData = this.currentResult[selectedRowIndex];
+        this.currentModalRef.instance.currentDisplayRowData = ResultPanelComponent.trimDisplayJsonData(newRowData as IndexableObject);
+        this.currentModalRef.instance.currentDisplayRowIndex = selectedRowIndex - this.currentPageIndex * this.currentMaxPageSize;
+      }
+    };
+    next.bind(this);
+
     // open the modal component
     const modalRef = this.componentInserter.injectComponent<NgbModalComponent>(
       NgbModalComponent,
-      this.viewContainerRef);
+      this.viewContainerRef,
+      [
+        {provide: 'prev', useValue: prev},
+        {provide: 'next', useValue: next}
+      ]
+      );
 
-    // subscribe the modal close event for modal navigations (go to previous or next row detail)
-    Observable.from(modalRef.instance.result)
-      .subscribe((modalResult: number) => {
-        if (modalResult === 1) {
-          // navigate to previous detail modal
-          this.open(this.currentResult[selectedRowIndex - 1]);
-        } else if (modalResult === 2) {
-          // navigate to next detail modal
-          this.open(this.currentResult[selectedRowIndex + 1]);
-        }
-      });
+    this.currentModalRef = modalRef;
 
     // cast the instance type from `any` to NgbModalComponent
     const modalComponentInstance = modalRef.instance as NgbModalComponent;
@@ -295,7 +311,7 @@ export class ResultPanelComponent {
   templateUrl: './result-panel-modal.component.html',
   styleUrls: ['./result-panel.component.scss']
 })
-export class NgbModalComponent extends ZorroModalDialogueComponent<number>  {
+export class NgbModalComponent extends ZorroModalComponent {
   // when modal is opened, currentDisplayRow will be passed as
   //  componentInstance to this NgbModalComponent to display
   //  as data table.
@@ -315,8 +331,12 @@ export class NgbModalComponent extends ZorroModalDialogueComponent<number>  {
   //  the pop-up modal.
   // it is used in the HTML template
 
+  // will be overriden by result-panel
+
   constructor(
-    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbModalComponent>>
+    @Optional() @Inject('ComponentRefPromise') ref: Promise<ComponentRef<NgbModalComponent>>,
+    @Inject('prev') public prev: () => void,
+    @Inject('next') public next: () => void
   ) { super(ref); }
 
 }

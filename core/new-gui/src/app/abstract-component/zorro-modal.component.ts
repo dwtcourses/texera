@@ -1,13 +1,22 @@
 import { Component, Output, EventEmitter, ComponentRef, Optional, Inject } from '@angular/core';
 
 
+
 @Component({
   template: '< <nz-modal [nzVisible]="isModalVisible">Abstract ZorroModal</nz-modal>',
 })
 export abstract class ZorroModalComponent {
-  public isModalVisible = true; // controls visibility via attribute binding in template
+  static readonly ANIMATION_TIME = 300; // ms, for the modal to appear or dismiss
 
-  constructor(@Optional() @Inject('ComponentRefPromise') private refPromise: Promise<ComponentRef<ZorroModalComponent>>) {}
+  public isModalVisible = false; // controls visibility via attribute binding in template
+
+  constructor(@Optional() @Inject('ComponentRefPromise') private refPromise: Promise<ComponentRef<ZorroModalComponent>>) {
+    // trigger appearance animation
+    setTimeout(() => {
+      this.isModalVisible = true;
+    }, 0);
+
+  }
 
   public hideModal(): void {
     this.isModalVisible = false;
@@ -29,7 +38,9 @@ export abstract class ZorroModalComponent {
     this.hideModal();
     if (this.refPromise) {
       this.refPromise.then((ref) => {
-        ref.destroy();
+        setTimeout(() => {
+          ref.destroy();
+        }, ZorroModalComponent.ANIMATION_TIME);
       });
     }
   }
@@ -38,7 +49,9 @@ export abstract class ZorroModalComponent {
     this.hideModal();
     if (this.refPromise) {
       this.refPromise.then((ref) => {
-        ref.destroy();
+        setTimeout(() => {
+          ref.destroy();
+        }, ZorroModalComponent.ANIMATION_TIME);
       });
     }
   }
