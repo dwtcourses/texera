@@ -2,9 +2,9 @@
   <div class="modal-body content-body">
     <ngx-json-viewer [json]="currentDisplayRowData" [expanded]="false"></ngx-json-viewer>
   </div>
-  <ng-template #modalFooter>
+  <div *nzModalFooter>
     <button nz-button [disabled]="currentDisplayRowIndex === 0" (click)="this.prev()">Previous</button>
     <button nz-button [disabled]="currentDisplayRowIndex === (currentPageSize - 1)" (click)="this.next()">Next</button>
     <button nz-button (click)="this.closeModal()">Close</button>
-  </ng-template>
+  </div>
 </nz-modal>
