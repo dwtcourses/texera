@@ -1,71 +1,74 @@
-<mat-toolbar class='texera-navigation-body navbar navbar-expand-sm bg-dark navbar-dark'>
-
-  <div class='texera-navigation-title'>
-    <a href="#">
-      Texera <span class="version-number">0.5.0</span>
-    </a>
-  </div>
-
-
-  <div class='texera-navigation-utilities'>
-    <nz-button-group>
-      <button nz-button (click)="onClickZoomOut()" title="zoom out">
-        <i nz-icon nzType="zoom-out" nzTheme="outline"></i>
-      </button>
-      <button nz-button (click)="onClickZoomIn()" title="zoom in">
-        <i nz-icon nzType="zoom-in" nzTheme="outline"></i>
-      </button>
-      <button nz-button (click)="onClickRestoreZoomOffsetDefaullt()" title="reset zoom">
-        <i nz-icon nzType="fullscreen" nzTheme="outline"></i>
-      </button>
-      <button nz-button (click)="onClickDeleteAllOperators()" title="delete all">
-        <i nz-icon nzType="delete" nzTheme="outline"></i>
-      </button>
-      <button nz-button [disabled]="!executionResultID" [nzDisabled]="!executionResultID" nz-dropdown
-        [nzDropdownMenu]="menu" id="downloadExcelOptions" title="download execution result">
-        <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
-      </button>
-      <nz-dropdown-menu #menu="nzDropdownMenu">
-        <ul nz-menu>
-          <li nz-menu-item>
-            <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('json')">Json File
-              (*.json)</a>
-          </li>
-          <li nz-menu-item>
-            <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('csv')"> CSV File
-              (*.csv)</a>
-          </li>
-          <li nz-menu-item>
-            <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('xlsx')">XLSX
-              File
-              (*.xlsx)</a>
-          </li>
-        </ul>
-      </nz-dropdown-menu>
-    </nz-button-group>
-  </div>
-
-  <div class='texera-navigation-execute'>
-    <nz-button-group>
-      <button nz-button (click)="undoRedo.undoAction()">
-        <i nz-icon nzType="undo" nzTheme="outline"></i>
-      </button>
-      <button nz-button (click)="undoRedo.redoAction()">
-        <i nz-icon nzType="redo" nzTheme="outline"></i>
-      </button>
-      <button nz-button nzType = 'primary' (click)="onButtonClick()">
-        <span *ngIf = 'runSpinner(); then loading else playCircle'></span>
-        <ng-template #loading>
-          <i nz-icon nzType="loading" nzTheme="outline"></i>
-        </ng-template>
-        <ng-template #playCircle>
-          <i nz-icon nzType='play-circle' nzTheme="outline"></i>
-        </ng-template>
-
-        RUN
-      </button>
-    </nz-button-group>
-  </div>
-
+<mat-toolbar nz-row class='texera-navigation-body'>
+  <nz-col nzSpan="4">
+    <div class='texera-navigation-title'>
+      <a href="#">
+        Texera <span class="version-number">0.5.0</span>
+      </a>
+    </div>
+  </nz-col>
+  <nz-col nzSpan="20">
+    <div class='texera-navigation-utilities'>
+      <nz-button-group>
+        <button nz-button (click)="onClickZoomOut()" title="zoom out">
+          <i nz-icon nzType="zoom-out" nzTheme="outline"></i>
+        </button>
+        <button nz-button (click)="onClickZoomIn()" title="zoom in">
+          <i nz-icon nzType="zoom-in" nzTheme="outline"></i>
+        </button>
+        <button nz-button (click)="onClickRestoreZoomOffsetDefaullt()" title="reset zoom">
+          <i nz-icon nzType="fullscreen" nzTheme="outline"></i>
+        </button>
+        <button nz-button (click)="onClickDeleteAllOperators()" title="delete all">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+        <button nz-button [disabled]="!env.downloadExecutionResultEnabled"
+          [nzDisabled]="!env.downloadExecutionResultEnabled" nz-dropdown [nzDropdownMenu]="menu"
+          id="downloadExcelOptions" title="download execution result">
+          <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
+        </button>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('json')">Json File
+                (*.json)</a>
+            </li>
+            <li nz-menu-item>
+              <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('csv')"> CSV File
+                (*.csv)</a>
+            </li>
+            <li nz-menu-item>
+              <a nz-button class="drop-down-item" (click)="onClickDownloadExecutionResult('xlsx')">XLSX
+                File
+                (*.xlsx)</a>
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+      </nz-button-group>
+    </div>
+    <div class='texera-navigation-execute'>
+      <nz-button-group>
+        <button nz-button [disabled]="undoRedo.getUndoLength() == 0" (click)="undoRedo.undoAction()">
+          <i nz-icon nzType="undo" nzTheme="outline"></i>
+        </button>
+        <button nz-button [disabled]="undoRedo.getRedoLength() == 0" (click)="undoRedo.redoAction()">
+          <i nz-icon nzType="redo" nzTheme="outline"></i>
+        </button>
+        <button nz-button nzType='primary' [disabled]="!executionResultID"
+          (click)="resultPanelToggleService.toggleResultPanel()">
+          View Results
+        </button>
+        <button nz-button nzType='primary' (click)="onButtonClick()">
+          <span *ngIf='runSpinner(); then loading else playCircle'></span>
+          <ng-template #loading>
+            <i nz-icon nzType="loading" nzTheme="outline"></i>
+          </ng-template>
+          <ng-template #playCircle>
+            <i nz-icon nzType='play-circle' nzTheme="outline"></i>
+          </ng-template>
+          {{getRunButtonText()}}
+        </button>
+      </nz-button-group>
+    </div>
+  </nz-col>
 
 </mat-toolbar>

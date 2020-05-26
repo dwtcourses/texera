@@ -3,6 +3,7 @@ import { ExecuteWorkflowService } from './../../service/execute-workflow/execute
 import { UndoRedoService } from './../../service/undo-redo/undo-redo.service';
 import { environment } from '../../../../environments/environment';
 import { WorkflowActionService } from '../../service/workflow-graph/model/workflow-action.service';
+import { ResultPanelToggleService } from './../../service/result-panel-toggle/result-panel-toggle.service';
 import { JointGraphWrapper } from '../../service/workflow-graph/model/joint-graph-wrapper';
 
 import { ExecutionResult } from './../../types/execute-workflow.interface';
@@ -37,10 +38,12 @@ export class NavigationComponent implements OnInit {
   public showSpinner = false;
   public executionResultID: string | undefined;
 
+  private env = environment;
   constructor(
     private executeWorkflowService: ExecuteWorkflowService,
     private workflowActionService: WorkflowActionService,
     private workflowStatusService: WorkflowStatusService,
+    private resultPanelToggleService: ResultPanelToggleService, // used in template
     public undoRedo: UndoRedoService
     ) {
     // return the run button after the execution is finished, either
@@ -224,10 +227,6 @@ export class NavigationComponent implements OnInit {
    * Handler for the execution result to extract successful execution ID
    */
   private handleResultData(response: ExecutionResult): void {
-    if (!environment.downloadExecutionResultEnabled) {
-      return;
-    }
-
     // backend returns error, display error message
     if (response.code === 1) {
       this.executionResultID = undefined;
@@ -239,7 +238,6 @@ export class NavigationComponent implements OnInit {
       this.executionResultID = undefined;
       return;
     }
-
     // set the current execution result ID to the result ID
     this.executionResultID = response.resultID;
   }

@@ -43,7 +43,7 @@ export class ResultPanelComponent {
   public currentDisplayColumns: string[] | undefined;
   public currentDataSource: MatTableDataSource<object> | undefined;
   public currentModalRef: ComponentRef<NgbModalComponent>|undefined = undefined;
-  public showResultPanel: boolean | undefined;
+  public showResultPanel: boolean = false;
 
   @ViewChild(MatPaginator, { static : false }) paginator: MatPaginator | null = null;
 
